@@ -10,7 +10,7 @@
     "clash"
   ],
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --force",
     "start": "vite",
     "build": "vite build",
     "serve": "vite preview",
@@ -102,5 +102,10 @@
     "workbox-precaching": "6.5.4",
     "workbox-routing": "6.5.4",
     "workbox-strategies": "6.5.4"
+  },
+  "pnpm": {
+    "patchedDependencies": {
+      "@my-react/react-dom@0.3.6": "patches/@my-react__react-dom@0.3.6.patch"
+    }
   }
 }

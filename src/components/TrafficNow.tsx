@@ -74,7 +74,7 @@ function useConnection(apiConfig) {
       setState({
         upTotal: prettyBytes(uploadTotal),
         dlTotal: prettyBytes(downloadTotal),
-        connNumber: connections.length,
+        connNumber: connections?.length,
         mUsage: prettyBytes(memory),
       });
     },

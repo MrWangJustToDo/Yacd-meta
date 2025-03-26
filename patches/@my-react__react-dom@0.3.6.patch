@@ -1,0 +1,654 @@
+diff --git a/dist/cjs/index.development.js b/dist/cjs/index.development.js
+index 2d6653dae28b8eb030b13ba7fea74d6b29ab669c..34f7aa76d3bfa54ef4b1218e78552fe2f5da99d5 100644
+--- a/dist/cjs/index.development.js
++++ b/dist/cjs/index.development.js
+@@ -877,9 +877,13 @@ function requireIndex_development_1 () {
+ 		        return action.call.apply(action, __spreadArray([null], args, false));
+ 		    }
+ 		    catch (e) {
+-		        var renderPlatform = currentRenderPlatform$d.current;
+-		        renderPlatform.dispatchError({ fiber: fiber, error: e });
+-		        return fallback === null || fallback === void 0 ? void 0 : fallback();
++		        if (fallback) {
++		            return fallback();
++		        }
++		        else {
++		            var renderPlatform = currentRenderPlatform$d.current;
++		            renderPlatform.dispatchError({ fiber: fiber, error: e });
++		        }
+ 		    }
+ 		    finally {
+ 		        var l = stack.pop();
+@@ -978,13 +982,11 @@ function requireIndex_development_1 () {
+ 		    var renderFiber = warnFiber || currentCallingFiber.current || currentScopeFiber$1.current || currentRunningFiber$3.current;
+ 		    renderFiber && fiberWarn.apply(void 0, __spreadArray([renderFiber], args, false));
+ 		    var treeLog = renderFiber ? renderPlatform.getFiberTree(renderFiber) : "";
+-		    var obj = [];
+-		    var log = args.map(function (i) { return (typeof i === "object" ? (obj.push(i), "%o") : i); }).join(" ") + treeLog;
+ 		    if (enableFiberForLog.current && renderFiber) {
+-		        originalWarn.call.apply(originalWarn, __spreadArray(__spreadArray([console, log + "\n%o"], obj, false), [renderFiber], false));
++		        originalWarn.call.apply(originalWarn, __spreadArray(__spreadArray([console], args, false), [treeLog + "\n", renderFiber], false));
+ 		    }
+ 		    else {
+-		        originalWarn.call(console, log);
++		        originalWarn.call.apply(originalWarn, __spreadArray(__spreadArray([console], args, false), [treeLog], false));
+ 		    }
+ 		};
+ 		var devWarnWithFiber = function (fiber) {
+@@ -1006,13 +1008,11 @@ function requireIndex_development_1 () {
+ 		    var renderFiber = errorFiber || currentCallingFiber.current || currentScopeFiber$1.current || currentRunningFiber$3.current;
+ 		    renderFiber && fiberError.apply(void 0, __spreadArray([renderFiber], args, false));
+ 		    var treeLog = renderFiber ? renderPlatform.getFiberTree(renderFiber) : "";
+-		    var obj = [];
+-		    var log = args.map(function (i) { return (typeof i === "object" ? (obj.push(i), "%o") : i); }).join(" ") + treeLog;
+ 		    if (enableFiberForLog.current && renderFiber) {
+-		        originalError.call.apply(originalError, __spreadArray(__spreadArray([console, log + "\n%o"], obj, false), [renderFiber], false));
++		        originalError.call.apply(originalError, __spreadArray(__spreadArray([console], args, false), [treeLog + "\n", renderFiber], false));
+ 		    }
+ 		    else {
+-		        originalError.call(console, log);
++		        originalError.call.apply(originalError, __spreadArray(__spreadArray([console], args, false), [treeLog], false));
+ 		    }
+ 		};
+ 		var devErrorWithFiber = function (fiber) {
+@@ -2146,6 +2146,7 @@ function requireIndex_development_1 () {
+ 		    }
+ 		};
+ 		var processFunctionComponentUpdateQueue = function (fiber, renderDispatch, enableTaskPriority) {
++		    var _a, _b;
+ 		    if (myreactSharedExports.include(fiber.state, myreactSharedExports.STATE_TYPE.__unmount__))
+ 		        return;
+ 		    if (myreactSharedExports.exclude(fiber.type, exports.NODE_TYPE.__function__)) {
+@@ -2175,16 +2176,26 @@ function requireIndex_development_1 () {
+ 		                {
+ 		                    processedNodes.push(updater);
+ 		                }
+-		                var trigger = updater.trigger, payLoad_3 = updater.payLoad;
++		                var trigger = updater.trigger, payLoad_3 = updater.payLoad, reducer_1 = updater.reducer;
+ 		                var typedTrigger_1 = trigger;
+ 		                var lastResult_1 = typedTrigger_1.result;
++		                if (typedTrigger_1.type === myreactSharedExports.HOOK_TYPE.useSyncExternalStore) {
++		                    lastResult_1 = (_a = trigger.value) === null || _a === void 0 ? void 0 : _a.result;
++		                }
++		                var hasError_1 = false;
+ 		                typedTrigger_1.result = safeCallWithCurrentFiber({
+ 		                    fiber: fiber,
+ 		                    fallback: function safeFallbackForState() {
++		                        hasError_1 = true;
+ 		                        return lastResult_1;
+ 		                    },
+ 		                    action: function safeGetNextState() {
+-		                        return typedTrigger_1.reducer(lastResult_1, payLoad_3);
++		                        if (reducer_1 && typeof reducer_1 === "function") {
++		                            return reducer_1(lastResult_1, payLoad_3);
++		                        }
++		                        else {
++		                            return typedTrigger_1.reducer(lastResult_1, payLoad_3);
++		                        }
+ 		                    },
+ 		                });
+ 		                isSync = isSync || updater.isSync;
+@@ -2193,7 +2204,7 @@ function requireIndex_development_1 () {
+ 		                isImmediate = isImmediate || updater.isImmediate;
+ 		                isRetrigger = isRetrigger || updater.isRetrigger;
+ 		                updater.callback && callbacks.push(updater.callback);
+-		                if (!needUpdate && (isForce || callbacks.length || !Object.is(lastResult_1, typedTrigger_1.result)))
++		                if (!needUpdate && (isForce || hasError_1 || callbacks.length || !Object.is(lastResult_1, typedTrigger_1.result)))
+ 		                    needUpdate = true;
+ 		                if (enableDebugFiled$a.current) {
+ 		                    var typedNode = updater;
+@@ -2325,16 +2336,26 @@ function requireIndex_development_1 () {
+ 		                {
+ 		                    processedNodes.push(updater);
+ 		                }
+-		                var trigger = updater.trigger, payLoad_4 = updater.payLoad;
++		                var trigger = updater.trigger, payLoad_4 = updater.payLoad, reducer_2 = updater.reducer;
+ 		                var typedTrigger_2 = trigger;
+ 		                var lastResult_2 = typedTrigger_2.result;
++		                if (typedTrigger_2.type === myreactSharedExports.HOOK_TYPE.useSyncExternalStore) {
++		                    lastResult_2 = (_b = trigger.value) === null || _b === void 0 ? void 0 : _b.result;
++		                }
++		                var hasError_2 = false;
+ 		                typedTrigger_2.result = safeCallWithCurrentFiber({
+ 		                    fiber: fiber,
+ 		                    fallback: function safeFallbackForState() {
++		                        hasError_2 = true;
+ 		                        return lastResult_2;
+ 		                    },
+ 		                    action: function safeGetNextState() {
+-		                        return typedTrigger_2.reducer(lastResult_2, payLoad_4);
++		                        if (reducer_2 && typeof reducer_2 === "function") {
++		                            return reducer_2(lastResult_2, payLoad_4);
++		                        }
++		                        else {
++		                            return typedTrigger_2.reducer(lastResult_2, payLoad_4);
++		                        }
+ 		                    },
+ 		                });
+ 		                isSync = isSync || updater.isSync;
+@@ -2343,7 +2364,7 @@ function requireIndex_development_1 () {
+ 		                isImmediate = isImmediate || updater.isImmediate;
+ 		                isRetrigger = isRetrigger || updater.isRetrigger;
+ 		                updater.callback && callbacks.push(updater.callback);
+-		                if (!needUpdate && (isForce || callbacks.length || !Object.is(lastResult_2, typedTrigger_2.result)))
++		                if (!needUpdate && (isForce || hasError_2 || callbacks.length || !Object.is(lastResult_2, typedTrigger_2.result)))
+ 		                    needUpdate = true;
+ 		                if (enableDebugFiled$a.current) {
+ 		                    var typedNode = updater;
+@@ -4029,7 +4050,6 @@ function requireIndex_development_1 () {
+ 		        _this.value = value;
+ 		        _this.reducer = reducer;
+ 		        return _this;
+-		        // this._dispatch = this._dispatch.bind(this);
+ 		    }
+ 		    Object.defineProperty(MyReactHookNode.prototype, "isMyReactHook", {
+ 		        get: function () {
+@@ -4044,9 +4064,6 @@ function requireIndex_development_1 () {
+ 		        var renderPlatform = currentRenderPlatform$6.current;
+ 		        renderPlatform === null || renderPlatform === void 0 ? void 0 : renderPlatform.dispatchState(updater);
+ 		    };
+-		    MyReactHookNode.prototype._dispatch = function (action) {
+-		        this._update({ payLoad: action, isForce: false, isSync: enableSyncFlush.current });
+-		    };
+ 		    return MyReactHookNode;
+ 		}(MyReactInternalInstance));
+ 		var initHookInstance = function (hookNode) {
+@@ -4054,7 +4071,7 @@ function requireIndex_development_1 () {
+ 		    if (!field)
+ 		        throw new Error("[@my-react/react] hook instance not found, look like a bug for @my-react");
+ 		    var typedField = field;
+-		    typedField.dispatch = function (action) { return hookNode._dispatch(action); };
++		    typedField.dispatch = function (action) { return hookNode._update({ payLoad: action, isForce: false, isSync: enableSyncFlush.current }); };
+ 		};
+ 
+ 		var currentComponentFiber$2 = react.__my_react_internal__.currentComponentFiber;
+@@ -4159,16 +4176,17 @@ function requireIndex_development_1 () {
+ 		        hookNode.result = nextResult;
+ 		        var checkResultUpdate_1 = function checkResultUpdate() {
+ 		            var prevResult = storeApi_1.result;
++		            var nextResult = null;
+ 		            var hasChange = true;
+ 		            try {
+-		                var nextResult_1 = storeApi_1.getSnapshot.call(null);
+-		                hasChange = !Object.is(prevResult, nextResult_1);
++		                nextResult = storeApi_1.getSnapshot.call(null);
++		                hasChange = !Object.is(prevResult, nextResult);
+ 		            }
+ 		            catch (_a) {
+ 		                hasChange = true;
+ 		            }
+ 		            if (hasChange) {
+-		                hookNode._update({ isForce: true, isSync: true });
++		                hookNode._update({ isForce: true, isSync: true, payLoad: function () { return nextResult; } });
+ 		            }
+ 		        };
+ 		        renderDispatch.pendingLayoutEffect(fiber, function invokeLayoutEffectOnHook() {
+@@ -4180,6 +4198,27 @@ function requireIndex_development_1 () {
+ 		            hookNode.cancel = storeApi_1.subscribe(checkResultUpdate_1);
+ 		        });
+ 		    }
++		    // if (hookNode.type === HOOK_TYPE.useSyncExternalStore) {
++		    //   const storeApi = hookNode.value;
++		    //   const getNextResult = () =>
++		    //     safeCallWithCurrentFiber({
++		    //       fiber,
++		    //       action: function safeCallGetSnapshot() {
++		    //         return renderDispatch.isAppMounted
++		    //           ? storeApi.getSnapshot.call(null)
++		    //           : storeApi.getServerSnapshot
++		    //             ? storeApi.getServerSnapshot?.call(null)
++		    //             : storeApi.getSnapshot.call(null);
++		    //       },
++		    //     });
++		    //   const nextResult = getNextResult();
++		    //   if (!Object.is(nextResult, getNextResult())) {
++		    //     throw new Error(`[@my-react/react] syncExternalStore getSnapshot not stable!`);
++		    //   }
++		    //   storeApi.result = nextResult;
++		    //   hookNode.result = nextResult;
++		    //   hookNode.hasEffect = true;
++		    // }
+ 		    if (hookNode.type === myreactSharedExports.HOOK_TYPE.useSignal) {
+ 		        hookNode.result = new MyReactSignal(hookNode.value.call(null), renderDispatch);
+ 		    }
+@@ -4267,17 +4306,17 @@ function requireIndex_development_1 () {
+ 		                setEffectForInstance(hookNode, myreactSharedExports.Effect_TYPE.__initial__);
+ 		            });
+ 		        }
+-		        // if (hookNode.type === HOOK_TYPE.useSyncExternalStore) {
+-		        //   renderDispatch.pendingEffect(fiber, function invokeEffectOnHook() {
+-		        //     hookNode.cancel && hookNode.cancel();
+-		        //     const storeApi = hookNode.value;
+-		        //     hookNode.cancel = storeApi.subscribe(function triggerHookUpdate() {
+-		        //       hookNode._update({ payLoad: () => storeApi.getSnapshot.call(null) });
+-		        //     });
+-		        //     hookNode.hasEffect = false;
+-		        //     setEffectForInstance(hookNode, Effect_TYPE.__initial__);
+-		        //   });
+-		        // }
++		        if (hookNode.type === myreactSharedExports.HOOK_TYPE.useSyncExternalStore) {
++		            renderDispatch.pendingEffect(fiber, function invokeEffectOnHook() {
++		                hookNode.cancel && hookNode.cancel();
++		                var storeApi = hookNode.value;
++		                hookNode.cancel = storeApi.subscribe(function triggerHookUpdate() {
++		                    hookNode._update({ payLoad: function () { return storeApi.getSnapshot.call(null); } });
++		                });
++		                hookNode.hasEffect = false;
++		                setEffectForInstance(hookNode, myreactSharedExports.Effect_TYPE.__initial__);
++		            });
++		        }
+ 		    }
+ 		};
+ 
+@@ -4351,16 +4390,17 @@ function requireIndex_development_1 () {
+ 		        currentHook.result = nextResult_1;
+ 		        var checkResultUpdate_1 = function checkResultUpdate() {
+ 		            var prevResult = storeApi_1.result;
++		            var nextResult = null;
+ 		            var hasChange = true;
+ 		            try {
+-		                var nextResult_2 = storeApi_1.getSnapshot.call(null);
+-		                hasChange = !Object.is(prevResult, nextResult_2);
++		                nextResult = storeApi_1.getSnapshot.call(null);
++		                hasChange = !Object.is(prevResult, nextResult);
+ 		            }
+ 		            catch (_a) {
+ 		                hasChange = true;
+ 		            }
+ 		            if (hasChange) {
+-		                currentHook._update({ isForce: true, isSync: true });
++		                currentHook._update({ isForce: true, isSync: true, payLoad: function () { return nextResult; } });
+ 		            }
+ 		        };
+ 		        if (!Object.is(prevResult, nextResult_1) ||
+@@ -4381,6 +4421,26 @@ function requireIndex_development_1 () {
+ 		        }
+ 		        return currentHook;
+ 		    }
++		    // if (currentHook.type === HOOK_TYPE.useSyncExternalStore) {
++		    //   const storeApi = currentHook.value;
++		    //   const newStoreApi = value;
++		    //   const nextResult = safeCallWithCurrentFiber({
++		    //     fiber,
++		    //     action: function safeCallGetSnapshot() {
++		    //       return newStoreApi.getSnapshot.call(null);
++		    //     },
++		    //   });
++		    //   if (!Object.is(nextResult, newStoreApi.getSnapshot.call(null))) {
++		    //     throw new Error(`[@my-react/react] syncExternalStore getSnapshot not stable!`);
++		    //   }
++		    //   currentHook.result = nextResult;
++		    //   if (isHMR || !Object.is(storeApi.subscribe, newStoreApi.subscribe)) {
++		    //     storeApi.subscribe = newStoreApi.subscribe;
++		    //     currentHook.hasEffect = true;
++		    //   }
++		    //   storeApi.getSnapshot = newStoreApi.getSnapshot;
++		    //   return currentHook;
++		    // }
+ 		    if (currentHook.type === myreactSharedExports.HOOK_TYPE.useCallback) {
+ 		        if (isHMR || !deps || !myreactSharedExports.isArrayEquals(currentHook.deps, deps)) {
+ 		            currentHook.value = value;
+@@ -5996,7 +6056,6 @@ function requireIndex_development_1 () {
+ 		            isImmediate: true,
+ 		            // TODO
+ 		            isRetrigger: true,
+-		            _debugBaseValue: beforeValue,
+ 		            _debugBeforeValue: beforeValue,
+ 		            _debugAfterValue: afterValue,
+ 		            _debugCreateTime: now,
+@@ -6038,7 +6097,6 @@ function requireIndex_development_1 () {
+ 		        isForce: true,
+ 		        isImmediate: true,
+ 		        isRetrigger: false,
+-		        _debugBaseValue: beforeValue,
+ 		        _debugBeforeValue: beforeValue,
+ 		        _debugAfterValue: afterValue,
+ 		        _debugCreateTime: now,
+@@ -6071,7 +6129,6 @@ function requireIndex_development_1 () {
+ 		        isForce: true,
+ 		        isImmediate: true,
+ 		        isRetrigger: true,
+-		        _debugBaseValue: beforeValue,
+ 		        _debugBeforeValue: beforeValue,
+ 		        _debugAfterValue: afterValue,
+ 		        _debugCreateTime: now,
+@@ -6277,6 +6334,7 @@ function requireIndex_development_1 () {
+ 		var enableDebugFiled = react.__my_react_shared__.enableDebugFiled;
+ 		var processPromise = function (fiber, promise) {
+ 		    var _a, _b;
++		    deleteEffect(fiber, getCurrentDispatchFromFiber(fiber));
+ 		    if (promise.state === "fulfilled") {
+ 		        react.use._updater(fiber, promise.value);
+ 		    }
+@@ -6289,8 +6347,6 @@ function requireIndex_development_1 () {
+ 		            promise.value = value;
+ 		            var renderDispatch = getCurrentDispatchFromFiber(fiber);
+ 		            hookListUnmount(fiber, renderDispatch);
+-		            classComponentUnmount(fiber, renderDispatch);
+-		            fiber.instance = null;
+ 		            fiber.hookList = null;
+ 		            fiber.updateQueue = null;
+ 		            deleteEffect(fiber, renderDispatch);
+@@ -11242,6 +11298,7 @@ var ClientDomDispatch = /** @class */ (function (_super) {
+             svgMap: new WeakMap(),
+             elementMap: new WeakMap(),
+         };
++        _this.mode = "development" ;
+         _this.version = "0.3.6";
+         _this.enableUpdate = true;
+         _this.runtimeRef = runtimeRef;
+diff --git a/dist/cjs/index.production.js b/dist/cjs/index.production.js
+index 53017dedf398ea307d31dec860253d0815f2d6e4..e6b55dfd54790f2c7a691d2680211e55983f02e3 100644
+--- a/dist/cjs/index.production.js
++++ b/dist/cjs/index.production.js
+@@ -870,9 +870,13 @@ function requireIndex_production_1 () {
+ 		        return action.call.apply(action, __spreadArray([null], args, false));
+ 		    }
+ 		    catch (e) {
+-		        var renderPlatform = currentRenderPlatform$d.current;
+-		        renderPlatform.dispatchError({ fiber: fiber, error: e });
+-		        return fallback === null || fallback === void 0 ? void 0 : fallback();
++		        if (fallback) {
++		            return fallback();
++		        }
++		        else {
++		            var renderPlatform = currentRenderPlatform$d.current;
++		            renderPlatform.dispatchError({ fiber: fiber, error: e });
++		        }
+ 		    }
+ 		    finally {
+ 		        var l = stack.pop();
+@@ -971,13 +975,11 @@ function requireIndex_production_1 () {
+ 		    var renderFiber = warnFiber || currentCallingFiber.current || currentScopeFiber$1.current || currentRunningFiber$3.current;
+ 		    renderFiber && fiberWarn.apply(void 0, __spreadArray([renderFiber], args, false));
+ 		    var treeLog = renderFiber ? renderPlatform.getFiberTree(renderFiber) : "";
+-		    var obj = [];
+-		    var log = args.map(function (i) { return (typeof i === "object" ? (obj.push(i), "%o") : i); }).join(" ") + treeLog;
+ 		    if (enableFiberForLog.current && renderFiber) {
+-		        originalWarn.call.apply(originalWarn, __spreadArray(__spreadArray([console, log + "\n%o"], obj, false), [renderFiber], false));
++		        originalWarn.call.apply(originalWarn, __spreadArray(__spreadArray([console], args, false), [treeLog + "\n", renderFiber], false));
+ 		    }
+ 		    else {
+-		        originalWarn.call(console, log);
++		        originalWarn.call.apply(originalWarn, __spreadArray(__spreadArray([console], args, false), [treeLog], false));
+ 		    }
+ 		};
+ 		var devWarnWithFiber = function (fiber) {
+@@ -999,13 +1001,11 @@ function requireIndex_production_1 () {
+ 		    var renderFiber = errorFiber || currentCallingFiber.current || currentScopeFiber$1.current || currentRunningFiber$3.current;
+ 		    renderFiber && fiberError.apply(void 0, __spreadArray([renderFiber], args, false));
+ 		    var treeLog = renderFiber ? renderPlatform.getFiberTree(renderFiber) : "";
+-		    var obj = [];
+-		    var log = args.map(function (i) { return (typeof i === "object" ? (obj.push(i), "%o") : i); }).join(" ") + treeLog;
+ 		    if (enableFiberForLog.current && renderFiber) {
+-		        originalError.call.apply(originalError, __spreadArray(__spreadArray([console, log + "\n%o"], obj, false), [renderFiber], false));
++		        originalError.call.apply(originalError, __spreadArray(__spreadArray([console], args, false), [treeLog + "\n", renderFiber], false));
+ 		    }
+ 		    else {
+-		        originalError.call(console, log);
++		        originalError.call.apply(originalError, __spreadArray(__spreadArray([console], args, false), [treeLog], false));
+ 		    }
+ 		};
+ 		var devErrorWithFiber = function (fiber) {
+@@ -1927,6 +1927,7 @@ function requireIndex_production_1 () {
+ 		    }
+ 		};
+ 		var processFunctionComponentUpdateQueue = function (fiber, renderDispatch, enableTaskPriority) {
++		    var _a, _b;
+ 		    if (myreactSharedExports.include(fiber.state, myreactSharedExports.STATE_TYPE.__unmount__))
+ 		        return;
+ 		    if (myreactSharedExports.exclude(fiber.type, exports.NODE_TYPE.__function__)) {
+@@ -1948,16 +1949,26 @@ function requireIndex_production_1 () {
+ 		            var nextNode = node.next;
+ 		            if (updater.type === myreactSharedExports.UpdateQueueType.hook && updater.isSync) {
+ 		                allQueue.delete(node);
+-		                var trigger = updater.trigger, payLoad_3 = updater.payLoad;
++		                var trigger = updater.trigger, payLoad_3 = updater.payLoad, reducer_1 = updater.reducer;
+ 		                var typedTrigger_1 = trigger;
+ 		                var lastResult_1 = typedTrigger_1.result;
++		                if (typedTrigger_1.type === myreactSharedExports.HOOK_TYPE.useSyncExternalStore) {
++		                    lastResult_1 = (_a = trigger.value) === null || _a === void 0 ? void 0 : _a.result;
++		                }
++		                var hasError_1 = false;
+ 		                typedTrigger_1.result = safeCallWithCurrentFiber({
+ 		                    fiber: fiber,
+ 		                    fallback: function safeFallbackForState() {
++		                        hasError_1 = true;
+ 		                        return lastResult_1;
+ 		                    },
+ 		                    action: function safeGetNextState() {
+-		                        return typedTrigger_1.reducer(lastResult_1, payLoad_3);
++		                        if (reducer_1 && typeof reducer_1 === "function") {
++		                            return reducer_1(lastResult_1, payLoad_3);
++		                        }
++		                        else {
++		                            return typedTrigger_1.reducer(lastResult_1, payLoad_3);
++		                        }
+ 		                    },
+ 		                });
+ 		                isSync = isSync || updater.isSync;
+@@ -1966,7 +1977,7 @@ function requireIndex_production_1 () {
+ 		                isImmediate = isImmediate || updater.isImmediate;
+ 		                isRetrigger = isRetrigger || updater.isRetrigger;
+ 		                updater.callback && callbacks.push(updater.callback);
+-		                if (!needUpdate && (isForce || callbacks.length || !Object.is(lastResult_1, typedTrigger_1.result)))
++		                if (!needUpdate && (isForce || hasError_1 || callbacks.length || !Object.is(lastResult_1, typedTrigger_1.result)))
+ 		                    needUpdate = true;
+ 		            }
+ 		            else if (updater.type === myreactSharedExports.UpdateQueueType.promise && updater.isSync) {
+@@ -2036,16 +2047,26 @@ function requireIndex_production_1 () {
+ 		            var nextNode = node.next;
+ 		            if (updater.type === myreactSharedExports.UpdateQueueType.hook) {
+ 		                allQueue.delete(node);
+-		                var trigger = updater.trigger, payLoad_4 = updater.payLoad;
++		                var trigger = updater.trigger, payLoad_4 = updater.payLoad, reducer_2 = updater.reducer;
+ 		                var typedTrigger_2 = trigger;
+ 		                var lastResult_2 = typedTrigger_2.result;
++		                if (typedTrigger_2.type === myreactSharedExports.HOOK_TYPE.useSyncExternalStore) {
++		                    lastResult_2 = (_b = trigger.value) === null || _b === void 0 ? void 0 : _b.result;
++		                }
++		                var hasError_2 = false;
+ 		                typedTrigger_2.result = safeCallWithCurrentFiber({
+ 		                    fiber: fiber,
+ 		                    fallback: function safeFallbackForState() {
++		                        hasError_2 = true;
+ 		                        return lastResult_2;
+ 		                    },
+ 		                    action: function safeGetNextState() {
+-		                        return typedTrigger_2.reducer(lastResult_2, payLoad_4);
++		                        if (reducer_2 && typeof reducer_2 === "function") {
++		                            return reducer_2(lastResult_2, payLoad_4);
++		                        }
++		                        else {
++		                            return typedTrigger_2.reducer(lastResult_2, payLoad_4);
++		                        }
+ 		                    },
+ 		                });
+ 		                isSync = isSync || updater.isSync;
+@@ -2054,7 +2075,7 @@ function requireIndex_production_1 () {
+ 		                isImmediate = isImmediate || updater.isImmediate;
+ 		                isRetrigger = isRetrigger || updater.isRetrigger;
+ 		                updater.callback && callbacks.push(updater.callback);
+-		                if (!needUpdate && (isForce || callbacks.length || !Object.is(lastResult_2, typedTrigger_2.result)))
++		                if (!needUpdate && (isForce || hasError_2 || callbacks.length || !Object.is(lastResult_2, typedTrigger_2.result)))
+ 		                    needUpdate = true;
+ 		            }
+ 		            else if (updater.type === myreactSharedExports.UpdateQueueType.promise) {
+@@ -3534,7 +3555,6 @@ function requireIndex_production_1 () {
+ 		        _this.value = value;
+ 		        _this.reducer = reducer;
+ 		        return _this;
+-		        // this._dispatch = this._dispatch.bind(this);
+ 		    }
+ 		    Object.defineProperty(MyReactHookNode.prototype, "isMyReactHook", {
+ 		        get: function () {
+@@ -3549,9 +3569,6 @@ function requireIndex_production_1 () {
+ 		        var renderPlatform = currentRenderPlatform$6.current;
+ 		        renderPlatform === null || renderPlatform === void 0 ? void 0 : renderPlatform.dispatchState(updater);
+ 		    };
+-		    MyReactHookNode.prototype._dispatch = function (action) {
+-		        this._update({ payLoad: action, isForce: false, isSync: enableSyncFlush.current });
+-		    };
+ 		    return MyReactHookNode;
+ 		}(MyReactInternalInstance));
+ 		var initHookInstance = function (hookNode) {
+@@ -3559,7 +3576,7 @@ function requireIndex_production_1 () {
+ 		    if (!field)
+ 		        throw new Error("[@my-react/react] hook instance not found, look like a bug for @my-react");
+ 		    var typedField = field;
+-		    typedField.dispatch = function (action) { return hookNode._dispatch(action); };
++		    typedField.dispatch = function (action) { return hookNode._update({ payLoad: action, isForce: false, isSync: enableSyncFlush.current }); };
+ 		};
+ 
+ 		var currentComponentFiber$1 = react.__my_react_internal__.currentComponentFiber;
+@@ -3663,16 +3680,17 @@ function requireIndex_production_1 () {
+ 		        hookNode.result = nextResult;
+ 		        var checkResultUpdate_1 = function checkResultUpdate() {
+ 		            var prevResult = storeApi_1.result;
++		            var nextResult = null;
+ 		            var hasChange = true;
+ 		            try {
+-		                var nextResult_1 = storeApi_1.getSnapshot.call(null);
+-		                hasChange = !Object.is(prevResult, nextResult_1);
++		                nextResult = storeApi_1.getSnapshot.call(null);
++		                hasChange = !Object.is(prevResult, nextResult);
+ 		            }
+ 		            catch (_a) {
+ 		                hasChange = true;
+ 		            }
+ 		            if (hasChange) {
+-		                hookNode._update({ isForce: true, isSync: true });
++		                hookNode._update({ isForce: true, isSync: true, payLoad: function () { return nextResult; } });
+ 		            }
+ 		        };
+ 		        renderDispatch.pendingLayoutEffect(fiber, function invokeLayoutEffectOnHook() {
+@@ -3684,6 +3702,27 @@ function requireIndex_production_1 () {
+ 		            hookNode.cancel = storeApi_1.subscribe(checkResultUpdate_1);
+ 		        });
+ 		    }
++		    // if (hookNode.type === HOOK_TYPE.useSyncExternalStore) {
++		    //   const storeApi = hookNode.value;
++		    //   const getNextResult = () =>
++		    //     safeCallWithCurrentFiber({
++		    //       fiber,
++		    //       action: function safeCallGetSnapshot() {
++		    //         return renderDispatch.isAppMounted
++		    //           ? storeApi.getSnapshot.call(null)
++		    //           : storeApi.getServerSnapshot
++		    //             ? storeApi.getServerSnapshot?.call(null)
++		    //             : storeApi.getSnapshot.call(null);
++		    //       },
++		    //     });
++		    //   const nextResult = getNextResult();
++		    //   if (!Object.is(nextResult, getNextResult())) {
++		    //     throw new Error(`[@my-react/react] syncExternalStore getSnapshot not stable!`);
++		    //   }
++		    //   storeApi.result = nextResult;
++		    //   hookNode.result = nextResult;
++		    //   hookNode.hasEffect = true;
++		    // }
+ 		    if (hookNode.type === myreactSharedExports.HOOK_TYPE.useSignal) {
+ 		        hookNode.result = new MyReactSignal(hookNode.value.call(null), renderDispatch);
+ 		    }
+@@ -3763,17 +3802,17 @@ function requireIndex_production_1 () {
+ 		                setEffectForInstance(hookNode, myreactSharedExports.Effect_TYPE.__initial__);
+ 		            });
+ 		        }
+-		        // if (hookNode.type === HOOK_TYPE.useSyncExternalStore) {
+-		        //   renderDispatch.pendingEffect(fiber, function invokeEffectOnHook() {
+-		        //     hookNode.cancel && hookNode.cancel();
+-		        //     const storeApi = hookNode.value;
+-		        //     hookNode.cancel = storeApi.subscribe(function triggerHookUpdate() {
+-		        //       hookNode._update({ payLoad: () => storeApi.getSnapshot.call(null) });
+-		        //     });
+-		        //     hookNode.hasEffect = false;
+-		        //     setEffectForInstance(hookNode, Effect_TYPE.__initial__);
+-		        //   });
+-		        // }
++		        if (hookNode.type === myreactSharedExports.HOOK_TYPE.useSyncExternalStore) {
++		            renderDispatch.pendingEffect(fiber, function invokeEffectOnHook() {
++		                hookNode.cancel && hookNode.cancel();
++		                var storeApi = hookNode.value;
++		                hookNode.cancel = storeApi.subscribe(function triggerHookUpdate() {
++		                    hookNode._update({ payLoad: function () { return storeApi.getSnapshot.call(null); } });
++		                });
++		                hookNode.hasEffect = false;
++		                setEffectForInstance(hookNode, myreactSharedExports.Effect_TYPE.__initial__);
++		            });
++		        }
+ 		    }
+ 		};
+ 
+@@ -3847,16 +3886,17 @@ function requireIndex_production_1 () {
+ 		        currentHook.result = nextResult_1;
+ 		        var checkResultUpdate_1 = function checkResultUpdate() {
+ 		            var prevResult = storeApi_1.result;
++		            var nextResult = null;
+ 		            var hasChange = true;
+ 		            try {
+-		                var nextResult_2 = storeApi_1.getSnapshot.call(null);
+-		                hasChange = !Object.is(prevResult, nextResult_2);
++		                nextResult = storeApi_1.getSnapshot.call(null);
++		                hasChange = !Object.is(prevResult, nextResult);
+ 		            }
+ 		            catch (_a) {
+ 		                hasChange = true;
+ 		            }
+ 		            if (hasChange) {
+-		                currentHook._update({ isForce: true, isSync: true });
++		                currentHook._update({ isForce: true, isSync: true, payLoad: function () { return nextResult; } });
+ 		            }
+ 		        };
+ 		        if (!Object.is(prevResult, nextResult_1) ||
+@@ -3877,6 +3917,26 @@ function requireIndex_production_1 () {
+ 		        }
+ 		        return currentHook;
+ 		    }
++		    // if (currentHook.type === HOOK_TYPE.useSyncExternalStore) {
++		    //   const storeApi = currentHook.value;
++		    //   const newStoreApi = value;
++		    //   const nextResult = safeCallWithCurrentFiber({
++		    //     fiber,
++		    //     action: function safeCallGetSnapshot() {
++		    //       return newStoreApi.getSnapshot.call(null);
++		    //     },
++		    //   });
++		    //   if (!Object.is(nextResult, newStoreApi.getSnapshot.call(null))) {
++		    //     throw new Error(`[@my-react/react] syncExternalStore getSnapshot not stable!`);
++		    //   }
++		    //   currentHook.result = nextResult;
++		    //   if (isHMR || !Object.is(storeApi.subscribe, newStoreApi.subscribe)) {
++		    //     storeApi.subscribe = newStoreApi.subscribe;
++		    //     currentHook.hasEffect = true;
++		    //   }
++		    //   storeApi.getSnapshot = newStoreApi.getSnapshot;
++		    //   return currentHook;
++		    // }
+ 		    if (currentHook.type === myreactSharedExports.HOOK_TYPE.useCallback) {
+ 		        if (isHMR || !deps || !myreactSharedExports.isArrayEquals(currentHook.deps, deps)) {
+ 		            currentHook.value = value;
+@@ -5514,6 +5574,7 @@ function requireIndex_production_1 () {
+ 		react.__my_react_shared__.enableDebugFiled;
+ 		var processPromise = function (fiber, promise) {
+ 		    var _a, _b;
++		    deleteEffect(fiber, getCurrentDispatchFromFiber(fiber));
+ 		    if (promise.state === "fulfilled") {
+ 		        react.use._updater(fiber, promise.value);
+ 		    }
+@@ -5526,8 +5587,6 @@ function requireIndex_production_1 () {
+ 		            promise.value = value;
+ 		            var renderDispatch = getCurrentDispatchFromFiber(fiber);
+ 		            hookListUnmount(fiber, renderDispatch);
+-		            classComponentUnmount(fiber, renderDispatch);
+-		            fiber.instance = null;
+ 		            fiber.hookList = null;
+ 		            fiber.updateQueue = null;
+ 		            deleteEffect(fiber, renderDispatch);
+@@ -9586,6 +9645,7 @@ var ClientDomDispatch = /** @class */ (function (_super) {
+             svgMap: new WeakMap(),
+             elementMap: new WeakMap(),
+         };
++        _this.mode = "production";
+         _this.version = "0.3.6";
+         _this.enableUpdate = true;
+         _this.runtimeRef = runtimeRef;

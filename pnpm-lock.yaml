@@ -4,6 +4,11 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+patchedDependencies:
+  '@my-react/react-dom@0.3.6':
+    hash: 10bb0940f73190f699b5294c6cb58c562fdb1436dfcdd43fb3a6bca35076fd16
+    path: patches/@my-react__react-dom@0.3.6.patch
+
 importers:
   .:
     dependencies:
@@ -12,7 +17,7 @@ importers:
         version: 0.3.6
       '@my-react/react-dom':
         specifier: ^0.3.6
-        version: 0.3.6(@my-react/react@0.3.6)
+        version: 0.3.6(patch_hash=10bb0940f73190f699b5294c6cb58c562fdb1436dfcdd43fb3a6bca35076fd16)(@my-react/react@0.3.6)
       '@reach/tooltip':
         specifier: 0.18.0
         version: 0.18.0(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
@@ -8096,7 +8101,7 @@ snapshots:
       hey-listen: 1.0.8
       tslib: 2.4.1
 
-  '@my-react/react-dom@0.3.6(@my-react/react@0.3.6)':
+  '@my-react/react-dom@0.3.6(patch_hash=10bb0940f73190f699b5294c6cb58c562fdb1436dfcdd43fb3a6bca35076fd16)(@my-react/react@0.3.6)':
     dependencies:
       '@my-react/react': 0.3.6
 
