@@ -17,6 +17,8 @@
     "prepare": "husky install"
   },
   "dependencies": {
+    "@my-react/react": "^0.3.6",
+    "@my-react/react-dom": "^0.3.6",
     "@reach/tooltip": "0.18.0",
     "@reach/visually-hidden": "0.18.0",
     "clsx": "^1.2.1",
@@ -40,6 +42,8 @@
     "@babel/runtime": "7.20.13",
     "@fontsource/inter": "4.5.15",
     "@fontsource/roboto-mono": "4.5.10",
+    "@my-react/react-refresh": "^0.3.6",
+    "@my-react/react-vite": "^0.0.10",
     "@types/invariant": "2.2.35",
     "@types/jest": "29.4.0",
     "@types/lodash-es": "4.17.6",

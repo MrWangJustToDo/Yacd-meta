@@ -1,4 +1,5 @@
-import react from '@vitejs/plugin-react';
+// import react from '@vitejs/plugin-react';
+import react from '@my-react/react-vite';
 import * as path from 'path';
 import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
