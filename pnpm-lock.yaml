@@ -4,20 +4,15 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
-patchedDependencies:
-  '@my-react/react-dom@0.3.6':
-    hash: 10bb0940f73190f699b5294c6cb58c562fdb1436dfcdd43fb3a6bca35076fd16
-    path: patches/@my-react__react-dom@0.3.6.patch
-
 importers:
   .:
     dependencies:
       '@my-react/react':
-        specifier: ^0.3.6
-        version: 0.3.6
+        specifier: ^0.3.8
+        version: 0.3.8
       '@my-react/react-dom':
-        specifier: ^0.3.6
-        version: 0.3.6(patch_hash=10bb0940f73190f699b5294c6cb58c562fdb1436dfcdd43fb3a6bca35076fd16)(@my-react/react@0.3.6)
+        specifier: ^0.3.8
+        version: 0.3.8(@my-react/react@0.3.8)
       '@reach/tooltip':
         specifier: 0.18.0
         version: 0.18.0(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
@@ -83,11 +78,11 @@ importers:
         specifier: 4.5.10
         version: 4.5.10
       '@my-react/react-refresh':
-        specifier: ^0.3.6
-        version: 0.3.6(@my-react/react@0.3.6)
+        specifier: ^0.3.8
+        version: 0.3.8(@my-react/react@0.3.8)
       '@my-react/react-vite':
-        specifier: ^0.0.10
-        version: 0.0.10(@my-react/react-refresh@0.3.6(@my-react/react@0.3.6))(vite@4.0.4(@types/node@22.13.13)(sass@1.57.1)(terser@5.39.0))
+        specifier: ^0.0.12
+        version: 0.0.12(@my-react/react-refresh@0.3.8(@my-react/react@0.3.8))(vite@4.0.4(@types/node@22.13.13)(sass@1.57.1)(terser@5.39.0))
       '@types/invariant':
         specifier: 2.2.35
         version: 2.2.35
@@ -1937,43 +1932,43 @@ packages:
         integrity: sha512-3XVF7sgyTSI2KWvTf6uLlBJ5iAgRgmvp3bpuOiQJvInd4nZ19ET8lX5unn30SlmRH7hXbBbH+Gxd0m0klJ3Xtw==,
       }
 
-  '@my-react/react-dom@0.3.6':
+  '@my-react/react-dom@0.3.8':
     resolution:
       {
-        integrity: sha512-VrOCByP4fDosjb+W/oF2LVWvdLYKBRU/+MRiF3P6biw6m088YsJ5JAa+72pbFb4mzYZqG77qh7WbKkvSexOJ6Q==,
+        integrity: sha512-Da+kWFI7KvHa5RHD5esRkPC/7wvEkuFiECwuDm5v+v/Zr3vmPcDVt2k7WMFaKyn+oLYBuH0OQNVfDEi6fLRxYA==,
       }
     peerDependencies:
-      '@my-react/react': '>=0.3.6'
+      '@my-react/react': '>=0.3.8'
 
-  '@my-react/react-jsx@0.3.6':
+  '@my-react/react-jsx@0.3.8':
     resolution:
       {
-        integrity: sha512-PHTFk1iNQYKpG7CA+3ZluYGTfr//CLwK0ufzpNblUcg26cfYgmDoPNLW450UEIpfVPv4aeE9DGLaL00UzN/KEA==,
+        integrity: sha512-Ho/9ZLlhSXhzev8HEKwcIrsRJzIcrJ2LOiNu0XIcLnnCiNA+V13WMZKlyVxQAU4esJwblxV2B5JUMSgZOhE1Dw==,
       }
     peerDependencies:
-      '@my-react/react': '>=0.3.6'
+      '@my-react/react': '>=0.3.8'
 
-  '@my-react/react-refresh@0.3.6':
+  '@my-react/react-refresh@0.3.8':
     resolution:
       {
-        integrity: sha512-YgW6GKJ42JmoTTsY/1zBktbudfQ6LQvjfh68PQJcbW0YGC009zHR0SAxf4hZ1HiyKDKXi0fyXNz4yLo83wEHYA==,
+        integrity: sha512-fgaTWYLzsrqz2qva4KzzEfhlXrEbF2YRIye7W8aBU1EEeLYUTjgNCyuSBfn4NlxP7Zp/pp7mclxixkfIJyXQyg==,
       }
     peerDependencies:
-      '@my-react/react': '>=0.3.6'
+      '@my-react/react': '>=0.3.8'
 
-  '@my-react/react-vite@0.0.10':
+  '@my-react/react-vite@0.0.12':
     resolution:
       {
-        integrity: sha512-Pjn8HMvoRBfaqZJPBMHFu+0MUK+GpmI/aMMndbu/Xo1vhKXHZP6OJvkSWLnwvse1rHctskjgqWfawtWh5DuFiw==,
+        integrity: sha512-j0stvbUfYWtxes9Hua4v8ya3diOPPAldI2BK/M/aE6xsXukK0B++uZadmroGRjLGb+8Qy1jm1o/ZmpqEimUWbQ==,
       }
     peerDependencies:
-      '@my-react/react-refresh': '>=0.3.6'
-      vite: ^4 || ^5
+      '@my-react/react-refresh': '>=0.3.8'
+      vite: ^4 || ^5 || ^6
 
-  '@my-react/react@0.3.6':
+  '@my-react/react@0.3.8':
     resolution:
       {
-        integrity: sha512-IbYr8wyBCSrdcx0V9JgXd5CMwjQxBIyiPnXTfmqAnN29+bYJr1i15i85Iwp4jUwGu81cuedOS2OrslwYhh/vqg==,
+        integrity: sha512-LL5Xi+stT45zBsMOteFqrzH+pnhsrkTDpTxU+rVjM/0zcMhicAvh47WRqo5IRmSGMatdrBWxm73NMaLPH8G64w==,
       }
 
   '@nicolo-ribaudo/eslint-scope-5-internals@5.1.1-v1':
@@ -8101,31 +8096,31 @@ snapshots:
       hey-listen: 1.0.8
       tslib: 2.4.1
 
-  '@my-react/react-dom@0.3.6(patch_hash=10bb0940f73190f699b5294c6cb58c562fdb1436dfcdd43fb3a6bca35076fd16)(@my-react/react@0.3.6)':
+  '@my-react/react-dom@0.3.8(@my-react/react@0.3.8)':
     dependencies:
-      '@my-react/react': 0.3.6
+      '@my-react/react': 0.3.8
 
-  '@my-react/react-jsx@0.3.6(@my-react/react@0.3.6)':
+  '@my-react/react-jsx@0.3.8(@my-react/react@0.3.8)':
     dependencies:
-      '@my-react/react': 0.3.6
+      '@my-react/react': 0.3.8
 
-  '@my-react/react-refresh@0.3.6(@my-react/react@0.3.6)':
+  '@my-react/react-refresh@0.3.8(@my-react/react@0.3.8)':
     dependencies:
-      '@my-react/react': 0.3.6
+      '@my-react/react': 0.3.8
 
-  '@my-react/react-vite@0.0.10(@my-react/react-refresh@0.3.6(@my-react/react@0.3.6))(vite@4.0.4(@types/node@22.13.13)(sass@1.57.1)(terser@5.39.0))':
+  '@my-react/react-vite@0.0.12(@my-react/react-refresh@0.3.8(@my-react/react@0.3.8))(vite@4.0.4(@types/node@22.13.13)(sass@1.57.1)(terser@5.39.0))':
     dependencies:
       '@babel/core': 7.26.10
       '@babel/plugin-transform-react-jsx-self': 7.25.9(@babel/core@7.26.10)
       '@babel/plugin-transform-react-jsx-source': 7.25.9(@babel/core@7.26.10)
-      '@my-react/react-refresh': 0.3.6(@my-react/react@0.3.6)
+      '@my-react/react-refresh': 0.3.8(@my-react/react@0.3.8)
       vite: 4.0.4(@types/node@22.13.13)(sass@1.57.1)(terser@5.39.0)
     transitivePeerDependencies:
       - supports-color
 
-  '@my-react/react@0.3.6':
+  '@my-react/react@0.3.8':
     dependencies:
-      '@my-react/react-jsx': 0.3.6(@my-react/react@0.3.6)
+      '@my-react/react-jsx': 0.3.8(@my-react/react@0.3.8)
 
   '@nicolo-ribaudo/eslint-scope-5-internals@5.1.1-v1':
     dependencies:
